@@ -1275,43 +1275,67 @@ body.sidebar-collapsed #pg-shell { left: 0; }
 <div class="concept-card"><h4>Mastery</h4><p>Choose arrow functions for clarity, not fashion. A master writes callbacks that are short enough to scan and extracts longer behavior into well-named helpers.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="1-arrow-functions">
-<p>You are preparing lesson data for a React list and want the transformation to stay visible instead of buried in long function syntax.</p>
+<h3>Beginner to Mastery: Arrow Functions</h3>
+<p>Arrow functions give JavaScript a compact way to pass behavior around. In React, that matters because components constantly pass small functions to array methods, event handlers, hooks, and helper utilities. The goal is not shorter code for its own sake; the goal is to make tiny pieces of behavior easy to read where they are used.</p>
 <h4>Why this exists in real work</h4>
-<p>Arrow functions make tiny transformations and callbacks easy to read at the exact place they are used.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const double = number =&gt; number * 2
-const shout = word =&gt; word.toUpperCase()</pre></div>
+<p>Before arrow functions, short callbacks required the heavier <code>function</code> syntax and had their own <code>this</code> binding. Arrow functions removed that friction. They are especially useful when the function is not a reusable named operation, but a small transformation such as turning a lesson into a title or responding to a click.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const titles = lessons.map(lesson =&gt; lesson.title);
+
+&lt;button onClick={() =&gt; setOpen(true)}&gt;
+  Open lesson
+&lt;/button&gt;</pre></div>
 <h4>What gets harder without it</h4>
-<p>The old syntax works, but simple ideas take more space and distract from the data flow.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const visibleLessons = lessons
-  .filter(lesson =&gt; !lesson.archived)
-  .map(lesson =&gt; lesson.title)</pre></div>
-<h4>Read the arrow as a data pipe</h4>
-<p>Begin with one value going in and one value coming out. In <code>number =&gt; number * 2</code>, the left side names the input and the right side states the result. Do not add React yet; first make the function answer a plain JavaScript question.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const double = number =&gt; number * 2
-const shout = word =&gt; word.toUpperCase()</pre></div>
-<h4>Use arrows where React expects callbacks</h4>
-<p>The moment you render lists or handle clicks, arrow functions become practical. They keep the callback next to the JSX or array method that uses it, so the reader sees the transformation without jumping to another file.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const visibleLessons = lessons
-  .filter(lesson =&gt; !lesson.archived)
-  .map(lesson =&gt; lesson.title)</pre></div>
-<h4>Check return style and <code>this</code></h4>
-<p>Arrow functions can return an expression automatically, but braces require an explicit <code>return</code>. They also inherit <code>this</code>, which is helpful in callbacks but wrong for object methods that need their own receiver.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const timer = {
-  seconds: 0,
-  start() {
-    setInterval(() =&gt; { this.seconds += 1 }, 1000)
-  }
+<p>Without arrow functions, modern React code becomes visually heavier. The important idea can be buried under syntax, especially when the callback is only one line. Older function callbacks can also surprise learners when <code>this</code> changes depending on how the function is called.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const titles = lessons.map(function (lesson) {
+  return lesson.title;
+});
+
+&lt;button onClick={function () {
+  setOpen(true);
+}}&gt;
+  Open lesson
+&lt;/button&gt;</pre></div>
+<h4>Beginner: return one value clearly</h4>
+<p>Start with a single parameter and a single returned value. If the function body is one expression, the value after the arrow is returned automatically. Add braces only when you need multiple statements.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const double = number =&gt; number * 2;
+const isAdult = age =&gt; age &gt;= 18;
+const formatName = user =&gt; user.firstName + " " + user.lastName;</pre></div>
+<h4>Intermediate: use arrows where React expects callbacks</h4>
+<p>React uses callbacks everywhere: rendering lists, handling clicks, filtering data, and creating derived values. Keep the callback small enough that the surrounding code still tells a clear story. If the callback grows, move it into a named helper.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function LessonList({ lessons }) {
+  const visibleLessons = lessons.filter(lesson =&gt; !lesson.completed);
+
+  return visibleLessons.map(lesson =&gt; (
+    &lt;button key={lesson.id} onClick={() =&gt; openLesson(lesson.id)}&gt;
+      {lesson.title}
+    &lt;/button&gt;
+  ));
 }</pre></div>
-<h4>Write short callbacks and named helpers</h4>
-<p>A clean React codebase uses arrows for short transformations and extracts larger decisions into named helpers such as <code>toLessonCard</code>. The judgment is knowing when the inline function has stopped being readable.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const toLessonCard = ({ id, title, minutes, done }) =&gt; ({
-  id,
-  title: title.trim(),
-  badge: done ? "Complete" : "Practice",
-  estimate: minutes &lt; 30 ? "Short" : "Deep"
-})</pre></div>
+<h4>Advanced: avoid recreating complex inline work</h4>
+<p>An inline arrow is fine for small work. It becomes a problem when it hides business logic, creates hard-to-test behavior, or makes a child component rerender because a new function is created every render. At that point, extract a named function or use a memoized callback when it solves a measured problem.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function LessonsPage({ lessons, onOpenLesson }) {
+  const handleOpenLesson = lessonId =&gt; {
+    trackEvent("lesson_opened", { lessonId });
+    onOpenLesson(lessonId);
+  };
+
+  return lessons.map(lesson =&gt; (
+    &lt;LessonRow
+      key={lesson.id}
+      lesson={lesson}
+      onOpen={() =&gt; handleOpenLesson(lesson.id)}
+    /&gt;
+  ));
+}</pre></div>
+<h4>Mastery: choose named functions when meaning matters</h4>
+<p>Mastery is knowing when not to inline. If the function expresses a business rule, give it a name. If it is only glue between a click and a setter, an inline arrow is often perfect.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const isAvailableForCertificate = lesson =&gt; {
+  return lesson.completed &amp;&amp; lesson.quizScore &gt;= 80 &amp;&amp; !lesson.archived;
+};
+
+const certificateLessons = lessons.filter(isAvailableForCertificate);</pre></div>
 </div>
-<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - 1. Arrow Functions</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Write <code>double</code>, <code>isAdult</code>, and <code>formatUser</code> as arrow functions. Then use arrows with <code>map</code>, <code>filter</code>, and a button <code>onClick</code> handler.</p></div></div>
+<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Arrow Functions</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Write <code>double</code>, <code>isAdult</code>, and <code>formatUser</code> as arrow functions. Then use arrows with <code>map</code>, <code>filter</code>, and a button <code>onClick</code> handler.</p></div></div>
 </section>
 
 <p>Arrow functions are a concise syntax for writing functions introduced in ES6. They are the default way to write functions in modern JavaScript and React.</p>
@@ -1487,34 +1511,51 @@ console.<span class="fn">log</span>(sorted)
 <div class="concept-card"><h4>Mastery</h4><p>Use destructuring to reveal intent. The reader should instantly see what data the component needs and what it ignores.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="2-destructuring">
-<p>A component receives a user, a lesson, or a query result and only needs a few values from it. The point is not to memorize the term <strong>2. Destructuring</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<h3>Beginner to Mastery: Destructuring</h3>
+<p>Destructuring lets you take the values you need from an object or array and name them locally. React code uses it because components receive objects all the time: props, hook return values, route params, form events, and API results.</p>
 <h4>Why this exists in real work</h4>
-<p>Destructuring turns object shape into readable local names.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const user = { name: "Aisha", role: "admin" }
-const { name, role } = user</pre></div>
+<p>A component should make its data needs obvious. Destructuring turns a large object into a small set of named values so the reader can see what the component actually depends on. It also avoids repeating long paths such as <code>props.lesson.title</code> throughout the render.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function LessonCard({ title, minutes, completed }) {
+  return &lt;article className={completed ? "done" : "active"}&gt;
+    &lt;h3&gt;{title}&lt;/h3&gt;
+    &lt;p&gt;{minutes} minutes&lt;/p&gt;
+  &lt;/article&gt;;
+}</pre></div>
 <h4>What gets harder without it</h4>
-<p>Repeated property access makes components noisy and hides the data contract.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function LessonCard({ title, minutes = 30, completed }) {
-  return &lt;p&gt;{title} - {minutes} minutes&lt;/p&gt;
+<p>Without destructuring, the same object name appears again and again. That noise makes it harder to see the actual UI logic, and it becomes easier to accidentally read from the wrong object when a component grows.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function LessonCard(props) {
+  return &lt;article className={props.completed ? "done" : "active"}&gt;
+    &lt;h3&gt;{props.title}&lt;/h3&gt;
+    &lt;p&gt;{props.minutes} minutes&lt;/p&gt;
+  &lt;/article&gt;;
 }</pre></div>
-<h4>Match the shape of the data</h4>
-<p>Object destructuring starts by copying the object shape on the left side. If the data has <code>{ title, minutes }</code>, pull exactly those names first before trying aliases, defaults, or nested fields.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const user = { name: "Aisha", role: "admin" }
-const { name, role } = user</pre></div>
-<h4>Make component inputs obvious</h4>
-<p>In a component parameter like <code>function Card({ title, completed })</code>, destructuring announces the component contract. The reader knows what the card consumes without scanning the whole function body.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function LessonCard({ title, minutes = 30, completed }) {
-  return &lt;p&gt;{title} - {minutes} minutes&lt;/p&gt;
+<h4>Beginner: match the data shape</h4>
+<p>For objects, destructure by property name. For arrays, destructure by position. That is why <code>{ name }</code> works for a user object, while <code>[count, setCount]</code> works for <code>useState</code>.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const user = { name: "Aisha", role: "admin" };
+const { name, role } = user;
+
+const statePair = [0, function setCount() {}];
+const [count, setCount] = statePair;</pre></div>
+<h4>Intermediate: rename and default intentionally</h4>
+<p>Rename values when the incoming name is unclear or conflicts with another local name. Add defaults when missing data should have a safe value, but do not use defaults to hide required data that should be validated.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function ProfileHeader({ userName: displayName, avatarUrl = "/avatar.png" }) {
+  return &lt;img src={avatarUrl} alt={displayName} /&gt;;
 }</pre></div>
-<h4>Use aliases and defaults carefully</h4>
-<p>Renaming is useful when API names are unclear, and defaults help when optional fields are missing. Deep destructuring can become hard to read, so use optional chaining or intermediate variables for nested data.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const { data: lessons = [], isLoading, error } = useQuery(...)</pre></div>
-<h4>Destructure to clarify, not to impress</h4>
-<p>The best destructuring removes noise. If the pattern is harder to understand than <code>user.address.city</code>, keep the property access or split the work into smaller named steps.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const { name: displayName, address, ...accountFlags } = user
-const city = address?.city ?? "Unknown"</pre></div>
+<h4>Advanced: keep nested destructuring readable</h4>
+<p>Deep destructuring can become a puzzle. If you need to read nested optional data, use a clear intermediate variable or optional chaining so the failure case is visible.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const { customer } = order;
+const city = customer?.address?.city ?? "Unknown city";
+
+// Clearer than destructuring several nested levels in one line.</pre></div>
+<h4>Mastery: reveal the component contract</h4>
+<p>Well-used destructuring is a form of documentation. The function signature shows what the component consumes, and the body stays focused on behavior and markup.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function CourseProgress({ completedLessons, totalLessons, onReset }) {
+  const percent = Math.round((completedLessons / totalLessons) * 100);
+
+  return &lt;ProgressPanel percent={percent} onReset={onReset} /&gt;;
+}</pre></div>
 </div>
-<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - 2. Destructuring</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Destructure a user object, rename <code>name</code> to <code>displayName</code>, add a default role, and destructure <code>[count, setCount]</code> from <code>useState</code>.</p></div></div>
+<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Destructuring</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Destructure a user object, rename <code>name</code> to <code>displayName</code>, add a default role, and destructure <code>[count, setCount]</code> from <code>useState</code>.</p></div></div>
 </section>
 
 <p>Destructuring lets you unpack values from arrays or properties from objects into distinct variables. It is one of the most commonly used ES6 features in React — used for props, state, hooks, and more.</p>
@@ -1694,33 +1735,50 @@ console.<span class="fn">log</span>(<span class="fn">formatUserGreeting</span>({
 <div class="concept-card"><h4>Mastery</h4><p>Design state shapes so updates stay simple. If changing one value requires copying five nested levels, the state model may need redesign.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="3-spread-and-rest-operators">
-<p>You need to update React state while preserving the old value safely. The point is not to memorize the term <strong>3. Spread & Rest Operators</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<h3>Beginner to Mastery: Spread and Rest Operators</h3>
+<p>The three dots mean different things depending on where they appear. Spread expands values out of an array or object. Rest gathers remaining values into an array or object. React developers use both because state should usually be updated by creating new values instead of mutating old ones.</p>
 <h4>Why this exists in real work</h4>
-<p>Spread/rest gives a concise way to copy, extend, merge, and collect data.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const numbers = [1, 2]
-const next = [...numbers, 3]</pre></div>
+<p>React notices state changes by comparing references. If you mutate an existing array or object, React may not see a clean new value, and other code may be surprised because the old value changed under its feet. Spread makes common immutable updates readable.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const nextLessons = [...lessons, newLesson];
+const nextSettings = { ...defaultSettings, ...userSettings };
+
+setLessons(nextLessons);</pre></div>
 <h4>What gets harder without it</h4>
-<p>Direct mutation can leave React unaware that something changed.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>setProfile(current =&gt; ({ ...current, name: value }))</pre></div>
-<h4>Copy before changing</h4>
-<p>The first habit is simple: build a new array or object instead of editing the old one. <code>[...items, next]</code> says the previous items stay intact and the new item is appended.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const numbers = [1, 2]
-const next = [...numbers, 3]</pre></div>
-<h4>Update React state without mutation</h4>
-<p>React notices state changes by comparing references. Spreading an object or array creates the new reference React needs, while preserving the pieces that did not change.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>setProfile(current =&gt; ({ ...current, name: value }))</pre></div>
-<h4>Remember that spread is shallow</h4>
-<p>Spreading an object copies the top level only. If <code>project.owner.name</code> changes, the owner object needs its own copy or the nested object is still shared.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>setProject(current =&gt; ({
-  ...current,
-  owner: { ...current.owner, name: "Naveed" }
-}))</pre></div>
-<h4>Shape state for simple updates</h4>
-<p>If one update requires several nested spreads, the state may be too deeply modeled. Experienced React developers often flatten state or split it so common updates stay readable.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const [primaryAction, ...secondaryActions] = actions
-const finalConfig = { ...defaults, ...env, ...userPrefs }</pre></div>
+<p>Without spread, developers often reach for mutation such as <code>push</code> or direct assignment. Mutation can work in plain JavaScript, but in React state it creates subtle bugs because the original value has been changed instead of replaced.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>lessons.push(newLesson);
+setLessons(lessons);
+
+// The same array was reused. React and future readers have less clarity.</pre></div>
+<h4>Beginner: copy before adding</h4>
+<p>Start with arrays. The old array remains unchanged, and the new array contains the added item. This is the basic habit behind many React state updates.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const lessons = ["JSX", "Props"];
+const nextLessons = [...lessons, "State"];
+
+console.log(lessons);     // ["JSX", "Props"]
+console.log(nextLessons); // ["JSX", "Props", "State"]</pre></div>
+<h4>Intermediate: update one object in a list</h4>
+<p>When updating one item, combine <code>map</code> with object spread. Return a copied object for the changed item and the original object for every unchanged item.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>setTodos(todos.map(todo =&gt; {
+  if (todo.id !== targetId) return todo;
+  return { ...todo, completed: !todo.completed };
+}));</pre></div>
+<h4>Advanced: understand shallow copying</h4>
+<p>Spread copies only one level. If an object contains another object, the nested object is still shared unless you copy that level too. This is why deeply nested state can become painful.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const nextUser = {
+  ...user,
+  profile: {
+    ...user.profile,
+    city: "Lahore",
+  },
+};</pre></div>
+<h4>Mastery: design state that is easy to update</h4>
+<p>If every update needs five spreads, the state shape may be too nested. Flatten the data, split state by responsibility, or use a reducer when the update rules are complex.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const lessonById = {
+  ...state.lessonById,
+  [lesson.id]: { ...state.lessonById[lesson.id], completed: true },
+};</pre></div>
 </div>
-<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - 3. Spread &amp; Rest Operators</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Copy an array and add one item, merge default settings with user settings, and update one todo item without changing the original array.</p></div></div>
+<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Spread &amp; Rest Operators</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Copy an array and add one item, merge default settings with user settings, and update one todo item without changing the original array.</p></div></div>
 </section>
 
 <p>Both use <code>...</code> — three dots. The difference is context: <strong>spread</strong> expands an iterable, <strong>rest</strong> collects multiple items into one.</p>
@@ -1905,30 +1963,51 @@ console.<span class="fn">log</span>(<span class="fn">buildTag</span>(<span class
 <div class="concept-card"><h4>Mastery</h4><p>Think in data pipelines. Raw API data becomes cleaned data, cleaned data becomes view models, view models become UI.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="4-array-methods-map-filter-reduce">
-<p>An API gives you arrays, but the UI needs filtered, sorted, summarized, and rendered information. The point is not to memorize the term <strong>4. Array Methods — map, filter, reduce</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<h3>Beginner to Mastery: Array Methods</h3>
+<p>Most React screens begin with arrays: lessons, users, products, messages, todos, search results. Array methods let you turn raw data into UI-ready data without manually managing loop indexes and temporary variables.</p>
 <h4>Why this exists in real work</h4>
-<p>Array methods let you describe the result you want instead of manually controlling a loop.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const titles = lessons.map(lesson =&gt; lesson.title)</pre></div>
-<h4>What gets harder without it</h4>
-<p>Manual loops mix iteration mechanics with business meaning.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const active = lessons.filter(lesson =&gt; !lesson.archived)</pre></div>
-<h4>Turn a list into a new list</h4>
-<p>Start with <code>map</code>: one lesson becomes one title, one user becomes one row, one product becomes one card. The number of items stays the same while the shape changes.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const titles = lessons.map(lesson =&gt; lesson.title)</pre></div>
-<h4>Filter before rendering</h4>
-<p>Real screens rarely show every record. <code>filter</code> lets you describe which items belong on screen before JSX enters the picture.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const active = lessons.filter(lesson =&gt; !lesson.archived)</pre></div>
-<h4>Summarize with reduce only when needed</h4>
-<p><code>reduce</code> is powerful because it turns many values into one result, such as a total, lookup table, or grouping. Use it when <code>map</code> and <code>filter</code> no longer describe the job.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const totalMinutes = lessons.reduce((sum, lesson) =&gt; sum + lesson.minutes, 0)</pre></div>
-<h4>Prepare view models intentionally</h4>
-<p>Mastery is building a clear pipeline: raw data comes in, invalid records are removed, display fields are computed, and rendering becomes almost boring.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const cards = lessons
-  .filter(canShowLesson)
-  .map(toLessonCardData)
-  .sort(byRecommendedOrder)</pre></div>
+<p><code>map</code> transforms each item, <code>filter</code> keeps the items that match a rule, and <code>reduce</code> combines many items into one result. These methods match the way React renders: data goes in, a new description of the UI comes out.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const visibleLessons = lessons
+  .filter(lesson =&gt; !lesson.archived)
+  .map(lesson =&gt; ({ id: lesson.id, title: lesson.title }));</pre></div>
+<h4>What gets harder without them</h4>
+<p>Manual loops work, but they spread the result-building logic across several lines. For UI code, that often hides the intention. Array methods let the reader see whether you are transforming, selecting, or summarizing data.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const visibleLessons = [];
+for (let i = 0; i &lt; lessons.length; i += 1) {
+  if (!lessons[i].archived) {
+    visibleLessons.push({ id: lessons[i].id, title: lessons[i].title });
+  }
+}</pre></div>
+<h4>Beginner: render with map</h4>
+<p>Use <code>map</code> when every item should become something else. In React, every rendered list item needs a stable <code>key</code> so React can track which item is which across updates.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function LessonList({ lessons }) {
+  return lessons.map(lesson =&gt; (
+    &lt;li key={lesson.id}&gt;{lesson.title}&lt;/li&gt;
+  ));
+}</pre></div>
+<h4>Intermediate: filter before rendering</h4>
+<p>Use <code>filter</code> when only some items should appear. Keep the rule readable; a named helper is better when the condition becomes more than a simple check.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const activeLessons = lessons.filter(lesson =&gt; {
+  return lesson.published &amp;&amp; !lesson.archived;
+});</pre></div>
+<h4>Advanced: reduce for totals and grouped data</h4>
+<p>Use <code>reduce</code> when the result is not one item per input item. Totals, grouped objects, lookup maps, and summaries are good uses. If a reduce becomes hard to read, split the reducer into a named function.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const totalMinutes = lessons.reduce((sum, lesson) =&gt; {
+  return sum + lesson.minutes;
+}, 0);
+
+const lessonsByLevel = lessons.reduce((groups, lesson) =&gt; {
+  const level = lesson.level;
+  return { ...groups, [level]: [...(groups[level] ?? []), lesson] };
+}, {});</pre></div>
+<h4>Mastery: build a data pipeline</h4>
+<p>Mastery is choosing the method that matches the question. Filter asks "which items remain?" Map asks "what does each item become?" Reduce asks "what single result do all items produce?" Chain them only while the pipeline stays readable.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const dashboardRows = lessons
+  .filter(isPublished)
+  .map(toDashboardRow)
+  .sort(byNewestFirst);</pre></div>
 </div>
-<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - 4. Array Methods — map, filter, reduce</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Given lessons with title, level, duration, and completed status: show only incomplete lessons, render their titles, and calculate total remaining minutes.</p></div></div>
+<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Array Methods — map, filter, reduce</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Given lessons with title, level, duration, and completed status: show only incomplete lessons, render their titles, and calculate total remaining minutes.</p></div></div>
 </section>
 
 
@@ -2249,27 +2328,61 @@ console.<span class="fn">log</span>(totalCredits, totalDebits)  <span class="cmt
 <div class="concept-card"><h4>Mastery</h4><p>Combine safe reading with explicit empty states so users understand what is missing instead of seeing broken UI.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="5-bonus-optional-chaining-and-nullish-coalescing">
-<p>A learner meets 5. Bonus: Optional Chaining & Nullish Coalescing as a practical tool, not just vocabulary. The point is not to memorize the term <strong>5. Bonus: Optional Chaining & Nullish Coalescing</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<h3>Beginner to Mastery: Optional Chaining and Nullish Coalescing</h3>
+<p>React screens often render before every piece of data is available. A user object may exist while <code>profile</code> is still missing, an API may return <code>null</code> for an optional field, or a count may correctly be <code>0</code>. Optional chaining and nullish coalescing exist to make those cases readable without hiding valid values.</p>
 <h4>Why this exists in real work</h4>
-<p>5. Bonus: Optional Chaining & Nullish Coalescing exists because it solves a recurring development problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
+<p><code>?.</code> safely stops a property read when the value on the left is <code>null</code> or <code>undefined</code>. <code>??</code> supplies a fallback only when the value is <code>null</code> or <code>undefined</code>. That difference matters because <code>0</code>, <code>false</code>, and an empty string can be meaningful data in a UI.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const avatarUrl = user.profile?.avatarUrl ?? "/images/default-avatar.png";
+const unreadLabel = inbox.unreadCount ?? "Not loaded yet";
+
+// If unreadCount is 0, the label stays 0 instead of becoming the fallback.</pre></div>
 <h4>What gets harder without it</h4>
-<p>Without it, the same problem is solved manually and inconsistently.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Read missing data safely</h4>
-<p>Optional chaining begins with a humble question: could this value be absent? If yes, <code>user.profile?.avatar</code> prevents the app from crashing while reading a nested property.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>Choose defaults without erasing valid values</h4>
-<p><code>??</code> gives a fallback only for <code>null</code> or <code>undefined</code>. That matters when <code>0</code>, <code>false</code>, or an empty string is a real value.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Do not hide broken contracts</h4>
-<p>Safe access is not a substitute for validation. If a required API field is missing, the UI should show a clear empty or error state instead of silently masking the problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// add edge-case handling</pre></div>
-<h4>Pair safe reads with user-facing states</h4>
-<p>A polished app does not merely avoid crashes. It explains absent data: no avatar uploaded, score not recorded yet, lesson unavailable, or profile incomplete.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// explain tradeoffs and choose deliberately</pre></div>
+<p>Without these operators, simple reads become chains of defensive checks. Those checks are easy to write incorrectly, especially when a valid falsey value should remain visible. The older <code>||</code> fallback style is dangerous for numbers and booleans because it treats <code>0</code> and <code>false</code> as if they were missing.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const avatarUrl = user &amp;&amp; user.profile &amp;&amp; user.profile.avatarUrl
+  ? user.profile.avatarUrl
+  : "/images/default-avatar.png";
+
+// Bug: if unreadCount is 0, this shows "Not loaded yet".
+const unreadLabel = inbox.unreadCount || "Not loaded yet";</pre></div>
+<h4>Beginner: read one uncertain value</h4>
+<p>Start with a single object and one field that may not exist yet. Read the expression from left to right: if <code>profile</code> is missing, JavaScript stops before trying to read <code>avatarUrl</code>; if the final value is missing, the fallback is used.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const user = { name: "Amina" };
+const avatar = user.profile?.avatarUrl ?? "/avatar.png";
+
+console.log(avatar); // "/avatar.png"</pre></div>
+<h4>Intermediate: keep real falsey values</h4>
+<p>In forms, dashboards, carts, and counters, zero is often a correct answer. Use <code>??</code> when the fallback means "not provided yet", and use explicit comparisons when the UI must distinguish empty, zero, and unavailable states.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function ScoreBadge({ score }) {
+  const label = score ?? "No score yet";
+  return &lt;span&gt;Score: {label}&lt;/span&gt;;
+}
+
+&lt;ScoreBadge score={0} /&gt; // renders "Score: 0"</pre></div>
+<h4>Advanced: stop safely, then decide what the UI should say</h4>
+<p>Optional chaining should prevent crashes, not silently erase important problems. After you safely read nested API data, decide whether the screen should show a fallback, a loading state, an error message, or a prompt to complete missing information.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function ShippingSummary({ order }) {
+  const city = order.customer?.address?.city;
+
+  if (!city) {
+    return &lt;p className="muted"&gt;Shipping city has not been added.&lt;/p&gt;;
+  }
+
+  return &lt;p&gt;Ships to {city}&lt;/p&gt;;
+}</pre></div>
+<h4>Mastery: use it where uncertainty is real</h4>
+<p>The mastered habit is restraint. Use optional chaining at boundaries where data is genuinely uncertain: API responses, optional props, stored preferences, route state, and feature flags. Inside code you fully control, repeated optional chaining can signal unclear data ownership; define a clearer shape instead.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function normalizeUser(apiUser) {
+  return {
+    id: apiUser.id,
+    name: apiUser.name ?? "Unnamed user",
+    avatarUrl: apiUser.profile?.avatarUrl ?? "/avatar.png",
+    isAdmin: apiUser.permissions?.includes("admin") ?? false,
+  };
+}
+
+// Components can now render a predictable user shape.</pre></div>
 </div>
-<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - 5. Bonus: Optional Chaining &amp; Nullish Coalescing</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Read <code>user.profile.avatarUrl</code> safely, default a missing city to "Unknown", and show "No score yet" only when score is nullish.</p></div></div>
+<div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Bonus: Optional Chaining &amp; Nullish Coalescing</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Read <code>user.profile.avatarUrl</code> safely, default a missing city to "Unknown", and show "No score yet" only when score is nullish.</p></div></div>
 </section>
 
 <p>Two modern operators you will see constantly in React code, especially when dealing with API data that might be <code>null</code> or <code>undefined</code>.</p>
@@ -2525,25 +2638,28 @@ console.<span class="fn">log</span>(<span class="fn">analyzeOrders</span>(orders
 <div class="concept-card"><h4>Mastery</h4><p>Teach the concept back in your own words and connect it to the capstone project.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="how-to-use-this-book">
-<p>A learner meets How to Use This Book as a practical tool, not just vocabulary.</p>
-<h4>Why this exists in real work</h4>
-<p>How to Use This Book exists because it solves a recurring development problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>What gets harder without it</h4>
-<p>Without it, the same problem is solved manually and inconsistently.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Start with the smallest visible purpose</h4>
-<p>Begin by finding what problem this topic solves in the project, then use the smallest example that proves it.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>Connect it to one practical workflow</h4>
-<p>Use the idea in a real page, component, command, or data flow so it stops being vocabulary.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Find the failure mode</h4>
-<p>Push the example until it breaks, then name what the topic does to prevent that break.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// add edge-case handling</pre></div>
-<h4>Explain the tradeoff</h4>
-<p>Use the concept when it improves clarity or safety, and skip it when a simpler approach says the same thing better.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// explain tradeoffs and choose deliberately</pre></div>
+<h3>How to Use This Book Like a Working Developer</h3>
+<p>This course is not meant to be read like a list of definitions. Each day gives you a concept, shows the smallest working version, then asks you to use it in a realistic task. The purpose is to build judgment: you should know what a tool does, why it exists, what problem appears without it, and when a simpler choice is better.</p>
+<h4>Why this section exists</h4>
+<p>Beginners often try to memorize syntax before they understand the problem the syntax solves. That makes React feel random. This guide tells you how to study each lesson: first understand the pain, then read the example, then type it, break it gently, repair it, and explain it back in your own words.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">study loop</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>1. Read the explanation before the code.
+2. Type the example instead of only copying it.
+3. Change one value and predict the result.
+4. Build the practice task without looking for ten minutes.
+5. Compare your result with the lesson and write what changed.</pre></div>
+<h4>What gets harder without a study method</h4>
+<p>Without a method, every new topic feels separate. You may understand <code>map</code> in one lesson but freeze when it appears inside JSX, or understand props in a tiny component but lose confidence when the same idea appears inside a form. A steady study loop connects the small example to real application work.</p>
+<h4>Beginner: make the example speak</h4>
+<p>For every code block, say what each important value is before and after the line runs. If a component receives <code>props</code>, name the exact values. If a function returns JSX, point to what appears on the page. This slows you down at first, but it builds the mental model that prevents guessing later.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const user = { name: "Sara", role: "admin" };
+
+// Before: user is one object with two fields.
+const { name } = user;
+// After: name is the string "Sara".</pre></div>
+<h4>Intermediate: move from example to feature</h4>
+<p>After you understand the smallest version, place it inside a component, route, form, or data transformation. This is where real learning happens because the concept must cooperate with nearby code instead of living as an isolated snippet.</p>
+<h4>Advanced and mastery: explain tradeoffs</h4>
+<p>At the end of a lesson, write one sentence about when you would use the tool and one sentence about when you would avoid it. This turns the course from memorization into engineering judgment.</p>
 </div>
 <div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - How to Use This Book</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>For every topic, write three notes: the purpose, one beginner example, and one mistake you made while practicing.</p></div></div>
 </section>
@@ -2568,25 +2684,26 @@ console.<span class="fn">log</span>(<span class="fn">analyzeOrders</span>(orders
 <div class="concept-card"><h4>Mastery</h4><p>Treat the 10 days as a spiral. Each pass should produce cleaner code, better explanations, and stronger debugging instincts.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="the-10-day-plan">
-<p>A learner meets The 10-Day Plan as a practical tool, not just vocabulary. The point is not to memorize the term <strong>The 10-Day Plan</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
-<h4>Why this exists in real work</h4>
-<p>The 10-Day Plan exists because it solves a recurring development problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>What gets harder without it</h4>
-<p>Without it, the same problem is solved manually and inconsistently.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Start with the smallest visible purpose</h4>
-<p>Begin by finding what problem this topic solves in the project, then use the smallest example that proves it.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>Connect it to one practical workflow</h4>
-<p>Use the idea in a real page, component, command, or data flow so it stops being vocabulary.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Find the failure mode</h4>
-<p>Push the example until it breaks, then name what the topic does to prevent that break.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// add edge-case handling</pre></div>
-<h4>Explain the tradeoff</h4>
-<p>Use the concept when it improves clarity or safety, and skip it when a simpler approach says the same thing better.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// explain tradeoffs and choose deliberately</pre></div>
+<h3>Understanding the 10-Day Plan</h3>
+<p>The ten days are ordered so that each layer supports the next one. JavaScript fundamentals come first because React code is mostly JavaScript. Git appears early because serious development needs history and recovery. Components, props, state, forms, effects, hooks, routing, styling, state management, APIs, testing, and deployment then build toward a complete production-style workflow.</p>
+<h4>Why this plan exists</h4>
+<p>A beginner can become overwhelmed if routing, forms, APIs, hooks, and deployment arrive at the same time. The plan separates concerns. One day teaches how data is shaped, another teaches how UI is composed, another teaches how state changes, and later days combine those skills into application behavior.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">learning path</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>Day 1: JavaScript you will use inside React
+Day 2: Git and GitHub so your work has history
+Day 3: project tooling and JSX
+Day 4: props, state, events, and forms
+Day 5: effects and reusable hooks
+Day 6: routing and styling
+Day 7: app-level state and server data
+Day 8: testing and deployment
+Day 9: interview and portfolio readiness
+Day 10: capstone integration</pre></div>
+<h4>What gets harder without this order</h4>
+<p>If you skip the foundation, later topics look mysterious for the wrong reason. A routing example may fail because props are unclear. A form may feel hard because state updates are unclear. A test may feel impossible because the component has hidden side effects. The sequence reduces that confusion by naming the dependency before using it.</p>
+<h4>Beginner: complete the day, not the whole career</h4>
+<p>On the first pass, focus on finishing the day with working examples. You do not need perfect architecture yet. You need a clean understanding of the day’s main concept and a small piece of code that proves it.</p>
+<h4>Intermediate to mastery: revisit with stricter standards</h4>
+<p>On the second pass, improve the same examples: rename variables, split components, add empty states, handle errors, write tests, and deploy. Mastery comes from returning to familiar code with sharper expectations.</p>
 </div>
 <div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - The 10-Day Plan</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Before starting each day, write what you expect the topic to help you build. After finishing, revise that expectation with what you learned.</p></div></div>
 </section>
@@ -2621,25 +2738,22 @@ console.<span class="fn">log</span>(<span class="fn">analyzeOrders</span>(orders
 <div class="concept-card"><h4>Mastery</h4><p>Build a personal starter checklist you can reuse for every new React project.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="prerequisites-checklist">
-<p>A learner meets Prerequisites Checklist as a practical tool, not just vocabulary.</p>
-<h4>Why this exists in real work</h4>
-<p>Prerequisites Checklist exists because it solves a recurring development problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>What gets harder without it</h4>
-<p>Without it, the same problem is solved manually and inconsistently.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Start with the smallest visible purpose</h4>
-<p>Begin by finding what problem this topic solves in the project, then use the smallest example that proves it.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>Connect it to one practical workflow</h4>
-<p>Use the idea in a real page, component, command, or data flow so it stops being vocabulary.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Find the failure mode</h4>
-<p>Push the example until it breaks, then name what the topic does to prevent that break.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// add edge-case handling</pre></div>
-<h4>Explain the tradeoff</h4>
-<p>Use the concept when it improves clarity or safety, and skip it when a simpler approach says the same thing better.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// explain tradeoffs and choose deliberately</pre></div>
+<h3>Prerequisites Checklist With Purpose</h3>
+<p>The prerequisites are the skills that let you focus on React instead of fighting the environment. You do not need to be an expert before starting, but you should be comfortable editing files, running terminal commands, reading JavaScript errors, and understanding basic HTML and CSS.</p>
+<h4>Why these prerequisites exist</h4>
+<p>React sits on top of the browser, JavaScript, Node tooling, and the command line. When any of those are completely unfamiliar, a simple React error can feel like five different problems at once. The checklist reduces that noise so each lesson can teach one main idea.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">environment check</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>node --version
+npm --version
+git --version
+
+# You should also know how to create a folder,
+# open it in an editor, and run a command inside it.</pre></div>
+<h4>What gets harder without them</h4>
+<p>Without basic JavaScript, JSX expressions feel strange. Without HTML, components feel disconnected from the page they render. Without CSS, layout issues look like React problems. Without Git, experimentation becomes risky because you cannot easily return to a working point.</p>
+<h4>Beginner: know enough to recognize the layer</h4>
+<p>When something breaks, first ask which layer is speaking. A red browser message may be JavaScript. A terminal failure may be Node or npm. A missing style may be CSS. A merge message may be Git. Naming the layer is often half the fix.</p>
+<h4>Intermediate to mastery: make setup repeatable</h4>
+<p>As you improve, your setup should become boring and repeatable. You should be able to create a project, install dependencies, run the dev server, commit your work, and explain every command you used.</p>
 </div>
 <div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Prerequisites Checklist</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Create a folder, open it in VS Code, write a small HTML page, run one terminal command, and explain what each prerequisite supports.</p></div></div>
 </section>
@@ -2760,7 +2874,7 @@ git reflog</pre></div>
 <div class="concept-card"><h4>Mastery</h4><p>Keep configuration intentional and portable. Document team defaults in the repository when needed.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="installation-and-configuration">
-<p>A repository task needs Installation & Configuration to keep history understandable. The point is not to memorize the term <strong>Installation & Configuration</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A repository task needs Installation & Configuration to keep history understandable.</p>
 <h4>Why this exists in real work</h4>
 <p>Installation & Configuration helps Git users move safely from change to review to recovery.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>git status</pre></div>
@@ -2818,25 +2932,36 @@ git config <span class="op">--</span>list</pre>
 <div class="concept-card"><h4>Mastery</h4><p>Every command should answer a question: what changed, what is staged, where am I, what history exists, or what needs publishing?</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="essential-commands">
-<p>A learner meets Essential Commands as a practical tool, not just vocabulary. The point is not to memorize the term <strong>Essential Commands</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
-<h4>Why this exists in real work</h4>
-<p>Essential Commands exists because it solves a recurring development problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>What gets harder without it</h4>
-<p>Without it, the same problem is solved manually and inconsistently.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Start with the smallest visible purpose</h4>
-<p>Begin by finding what problem this topic solves in the project, then use the smallest example that proves it.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>Connect it to one practical workflow</h4>
-<p>Use the idea in a real page, component, command, or data flow so it stops being vocabulary.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Find the failure mode</h4>
-<p>Push the example until it breaks, then name what the topic does to prevent that break.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// add edge-case handling</pre></div>
-<h4>Explain the tradeoff</h4>
-<p>Use the concept when it improves clarity or safety, and skip it when a simpler approach says the same thing better.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// explain tradeoffs and choose deliberately</pre></div>
+<h3>Essential Git Commands in Context</h3>
+<p>Git commands are not magic words; they are questions you ask your project history. <code>status</code> asks what changed, <code>add</code> chooses what belongs in the next snapshot, <code>commit</code> records that snapshot, <code>log</code> reads the story, and <code>diff</code> shows the exact lines that changed.</p>
+<h4>Why these commands exist</h4>
+<p>A project changes in small steps: you edit a component, fix a typo, update a style, remove a bug. Git’s essential commands let you inspect those steps before saving them permanently. That inspection is what keeps commits meaningful instead of accidental piles of unrelated work.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">daily command loop</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>git status
+# What files changed?
+
+git diff
+# What lines changed inside those files?
+
+git add src/App.jsx
+git commit -m "Add lesson list component"
+# Save one clear unit of work.</pre></div>
+<h4>What gets harder without them</h4>
+<p>Without <code>status</code> and <code>diff</code>, you commit blindly. Without <code>add</code>, you cannot choose a clean snapshot. Without <code>log</code>, you cannot explain how the project reached its current state. The result is history that cannot help you debug, review, or collaborate.</p>
+<h4>Beginner: inspect before saving</h4>
+<p>Before every commit, run <code>git status</code> and read each filename. Then run <code>git diff</code> and read the actual lines. This habit catches stray console logs, unfinished experiments, and files you did not mean to include.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>git status
+git diff
+git add README.md
+git commit -m "Explain project setup"</pre></div>
+<h4>Intermediate: separate unrelated work</h4>
+<p>If you changed a component and edited documentation, consider committing them separately. Separate commits make review easier and make it safer to revert one change without losing another.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>git add src/components/LessonCard.jsx
+git commit -m "Add lesson card component"
+
+git add README.md
+git commit -m "Document lesson card usage"</pre></div>
+<h4>Advanced and mastery: make history useful to another person</h4>
+<p>Useful history explains intent. Commit messages should say what changed in human terms, and each commit should be small enough that another developer can review it without reconstructing your whole afternoon.</p>
 </div>
 <div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Essential Commands</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Modify two files, stage only one, commit it, then stage and commit the second. Verify with <code>git log --stat</code>.</p></div></div>
 </section>
@@ -2932,7 +3057,7 @@ git log <span class="op">--oneline --graph --decorate</span></pre>
 <div class="concept-card"><h4>Mastery</h4><p>Use branch strategy to support review, release, and collaboration habits for the team.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="branching-and-merging">
-<p>A repository task needs Branching & Merging to keep history understandable. The point is not to memorize the term <strong>Branching & Merging</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A repository task needs Branching & Merging to keep history understandable.</p>
 <h4>Why this exists in real work</h4>
 <p>Branching & Merging helps Git users move safely from change to review to recovery.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>git status</pre></div>
@@ -3251,25 +3376,35 @@ git hash-object myfile.txt</pre></div>
 <div class="concept-card"><h4>Mastery</h4><p>Craft commits that tell one clear story each, making review and rollback easier.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="the-staging-area-index">
-<p>A learner meets The Staging Area (Index) as a practical tool, not just vocabulary. This turns the topic from an abstract definition into a decision you can make while building.</p>
-<h4>Why this exists in real work</h4>
-<p>The Staging Area (Index) exists because it solves a recurring development problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
+<h3>The Staging Area as a Review Desk</h3>
+<p>The staging area is the place where you prepare the next commit. Your working folder may contain many edits, but the staged set says, "these exact changes belong together." Think of it as a review desk between messy work and permanent project history.</p>
+<h4>Why the staging area exists</h4>
+<p>Real development is rarely perfectly linear. You may fix a button label while building a form, or notice a README typo while editing a component. The staging area lets you separate those changes into meaningful commits instead of recording everything at once.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>git status
+# modified: src/LoginForm.jsx
+# modified: README.md
+
+git add src/LoginForm.jsx
+git commit -m "Validate login form fields"
+
+git add README.md
+git commit -m "Fix setup instructions typo"</pre></div>
 <h4>What gets harder without it</h4>
-<p>Without it, the same problem is solved manually and inconsistently.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Create one trustworthy checkpoint</h4>
-<p>Begin with <code>git status</code>, stage one related change, and commit it with a message that says what changed. That single loop is the heart of Git.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>Use history while building</h4>
-<p>Once the basic loop is comfortable, inspect diffs before committing and read the log after committing. Git becomes less scary when you can see exactly what it knows.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Recover by inspecting before changing</h4>
-<p>Advanced Git work is mostly careful observation: status, diff, log, reflog, branch list. Look first, create a rescue branch if needed, then repair.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// add edge-case handling</pre></div>
-<h4>Make history useful for reviewers</h4>
-<p>A mature Git workflow leaves small commits, focused branches, and pull requests that explain intent. The history becomes documentation, not just storage.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// explain tradeoffs and choose deliberately</pre></div>
+<p>Without staging, every commit would include every current file change. That would make history noisy: bug fixes, formatting, experiments, and documentation edits would be mixed together. Reviewing, reverting, and understanding the project would become harder than necessary.</p>
+<h4>Beginner: stage one file deliberately</h4>
+<p>Start by staging one file at a time. After <code>git add</code>, run <code>git status</code> again and notice how the file moves from unstaged to staged. This makes Git visible instead of mysterious.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>git status
+git add src/App.jsx
+git status
+git commit -m "Render app shell"</pre></div>
+<h4>Intermediate: stage part of a file</h4>
+<p>When one file contains two unrelated edits, use patch staging. It lets you choose individual hunks so a commit can contain only the lines that belong to one idea.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>git add -p src/App.jsx
+# y = stage this hunk
+# n = leave this hunk unstaged
+# s = split a large hunk when possible</pre></div>
+<h4>Advanced and mastery: commit the story you want reviewers to read</h4>
+<p>A mastered Git workflow uses the staging area to create a clear story. Each commit should answer one question: what changed, and why does this change belong together?</p>
 </div>
 <div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - The Staging Area (Index)</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Make three changes in one file and use patch staging to commit only one of them.</p></div></div>
 </section>
@@ -3446,7 +3581,7 @@ git cat-file -p &lt;blob-sha&gt;
 <div class="concept-card"><h4>Mastery</h4><p>Create reproducible project setup that works for you, your team, and CI.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="node-js-and-npm">
-<p>A React project needs Node.js & npm so setup and tooling are repeatable. The point is not to memorize the term <strong>Node.js & npm</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A React project needs Node.js & npm so setup and tooling are repeatable.</p>
 <h4>Why this exists in real work</h4>
 <p>Node.js & npm reduces machine-specific surprises and makes project commands predictable.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>npm run dev</pre></div>
@@ -4237,7 +4372,7 @@ return &lt;LessonTable rows={rows} /&gt;</pre></div>
 <div class="concept-card"><h4>Mastery</h4><p>Prefer clear composition over prop explosions. If a component has too many mode props, composition may be the answer.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="component-composition">
-<p>A UI feature needs Component Composition so the screen can stay readable as it grows. The point is not to memorize the term <strong>Component Composition</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A UI feature needs Component Composition so the screen can stay readable as it grows.</p>
 <h4>Why this exists in real work</h4>
 <p>Component Composition organizes UI meaning into smaller decisions.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function Example() { return &lt;p&gt;Hello&lt;/p&gt; }</pre></div>
@@ -4302,7 +4437,7 @@ return &lt;LessonTable rows={rows} /&gt;</pre></div>
 <div class="concept-card"><h4>Mastery</h4><p>Separate data preparation from rendering when list logic grows.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="rendering-lists">
-<p>A UI feature needs Rendering Lists so the screen can stay readable as it grows. The point is not to memorize the term <strong>Rendering Lists</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A UI feature needs Rendering Lists so the screen can stay readable as it grows.</p>
 <h4>Why this exists in real work</h4>
 <p>Rendering Lists organizes UI meaning into smaller decisions.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function Example() { return &lt;p&gt;Hello&lt;/p&gt; }</pre></div>
@@ -4471,7 +4606,7 @@ return &lt;LessonTable rows={rows} /&gt;</pre></div>
 <div class="concept-card"><h4>Mastery</h4><p>Make UI states obvious and avoid clever one-liners that future readers must decode.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="jsx-expressions-masterclass">
-<p>A UI feature needs JSX Expressions Masterclass so the screen can stay readable as it grows. The point is not to memorize the term <strong>JSX Expressions Masterclass</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A UI feature needs JSX Expressions Masterclass so the screen can stay readable as it grows.</p>
 <h4>Why this exists in real work</h4>
 <p>JSX Expressions Masterclass organizes UI meaning into smaller decisions.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function Example() { return &lt;p&gt;Hello&lt;/p&gt; }</pre></div>
@@ -4545,7 +4680,7 @@ return &lt;LessonTable rows={rows} /&gt;</pre></div>
 <div class="concept-card"><h4>Mastery</h4><p>Keep DOM output clean and meaningful, not just visually correct.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="react-fragments">
-<p>A UI feature needs React Fragments so the screen can stay readable as it grows. The point is not to memorize the term <strong>React Fragments</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A UI feature needs React Fragments so the screen can stay readable as it grows.</p>
 <h4>Why this exists in real work</h4>
 <p>React Fragments organizes UI meaning into smaller decisions.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>function Example() { return &lt;p&gt;Hello&lt;/p&gt; }</pre></div>
@@ -4979,7 +5114,7 @@ setUser({ name: <span class="str">'Bob'</span> })
 <div class="concept-card"><h4>Mastery</h4><p>Design interactions that are predictable, accessible, and easy to test.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="handling-events">
-<p>A user interaction needs Handling Events to keep the screen and data in sync. The point is not to memorize the term <strong>Handling Events</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A user interaction needs Handling Events to keep the screen and data in sync.</p>
 <h4>Why this exists in real work</h4>
 <p>Handling Events gives React a predictable path from user action to next UI state.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const [value, setValue] = useState("")</pre></div>
@@ -5668,7 +5803,7 @@ useEffect(() =&gt; {
 <div class="concept-card"><h4>Mastery</h4><p>Use reducers to make state machines and business rules explicit.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="usereducer-complex-state">
-<p>A user interaction needs useReducer — Complex State to keep the screen and data in sync. The point is not to memorize the term <strong>useReducer — Complex State</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A user interaction needs useReducer — Complex State to keep the screen and data in sync.</p>
 <h4>Why this exists in real work</h4>
 <p>useReducer — Complex State gives React a predictable path from user action to next UI state.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const [value, setValue] = useState("")</pre></div>
@@ -5810,7 +5945,7 @@ useEffect(() =&gt; {
 <div class="concept-card"><h4>Mastery</h4><p>Use context for dependency access and app-level values, not as a default replacement for all props.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="usecontext-avoid-prop-drilling">
-<p>A component behavior repeats often enough that useContext — Avoid Prop Drilling can make it clearer. The point is not to memorize the term <strong>useContext — Avoid Prop Drilling</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A component behavior repeats often enough that useContext — Avoid Prop Drilling can make it clearer.</p>
 <h4>Why this exists in real work</h4>
 <p>useContext — Avoid Prop Drilling isolates stateful behavior behind a focused API.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const result = useExample()</pre></div>
@@ -5875,7 +6010,7 @@ useEffect(() =&gt; {
 <div class="concept-card"><h4>Mastery</h4><p>Build hooks that feel like small APIs: focused, documented by naming, and easy to test.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="custom-hooks">
-<p>A component behavior repeats often enough that Custom Hooks can make it clearer. The point is not to memorize the term <strong>Custom Hooks</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A component behavior repeats often enough that Custom Hooks can make it clearer.</p>
 <h4>Why this exists in real work</h4>
 <p>Custom Hooks isolates stateful behavior behind a focused API.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const result = useExample()</pre></div>
@@ -6507,25 +6642,37 @@ useEffect(() =&gt; {
 <div class="concept-card"><h4>Mastery</h4><p>Make every important screen refreshable, bookmarkable, and meaningful from the URL alone.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="basic-setup">
-<p>A learner meets Basic Setup as a practical tool, not just vocabulary.</p>
+<h3>Router Basic Setup From First Principles</h3>
+<p>Routing exists because a single-page React app still needs places: a home screen, a course screen, a lesson detail screen, a settings screen, and a not-found screen. React Router maps URLs to components so the browser address bar and the UI describe the same location.</p>
 <h4>Why this exists in real work</h4>
-<p>Basic Setup exists because it solves a recurring development problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
+<p>Without routing, every view change becomes hidden component state. The user cannot bookmark a lesson, refresh on a detail page, share a URL, or use browser back and forward reliably. Routing gives each important screen an address.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+const router = createBrowserRouter([
+  { path: "/", element: &lt;HomePage /&gt; },
+  { path: "/lessons", element: &lt;LessonsPage /&gt; },
+  { path: "/lessons/:lessonId", element: &lt;LessonPage /&gt; },
+]);
+
+export default function App() {
+  return &lt;RouterProvider router={router} /&gt;;
+}</pre></div>
 <h4>What gets harder without it</h4>
-<p>Without it, the same problem is solved manually and inconsistently.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Start with the smallest visible purpose</h4>
-<p>Begin by finding what problem this topic solves in the project, then use the smallest example that proves it.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>Connect it to one practical workflow</h4>
-<p>Use the idea in a real page, component, command, or data flow so it stops being vocabulary.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Find the failure mode</h4>
-<p>Push the example until it breaks, then name what the topic does to prevent that break.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// add edge-case handling</pre></div>
-<h4>Explain the tradeoff</h4>
-<p>Use the concept when it improves clarity or safety, and skip it when a simpler approach says the same thing better.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// explain tradeoffs and choose deliberately</pre></div>
+<p>If you store the current screen in <code>useState</code>, the app may look fine during a demo but breaks normal web behavior. Refresh loses the selected page, links cannot be shared, and the back button may not return to the previous screen.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>const [screen, setScreen] = useState("home");
+
+// This changes the UI, but the URL stays the same.
+// The user cannot open /lessons/intro directly.</pre></div>
+<h4>Beginner: create two routes</h4>
+<p>Begin with two pages and confirm that changing the URL changes the rendered component. Do not add nested layouts yet; first make the relationship between path and component obvious.</p>
+<h4>Intermediate: add links instead of manual clicks</h4>
+<p>Use <code>&lt;Link&gt;</code> or <code>&lt;NavLink&gt;</code> so navigation updates the URL without a full page reload. A link is better than a button when the action means "go to another place."</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>import { Link, NavLink } from "react-router-dom";
+
+&lt;NavLink to="/lessons"&gt;Lessons&lt;/NavLink&gt;
+&lt;Link to="/lessons/react-state"&gt;Open state lesson&lt;/Link&gt;</pre></div>
+<h4>Advanced and mastery: choose stable URLs</h4>
+<p>Good routes are part of your product design. A stable URL should be readable, shareable, and resilient when components are reorganized. Avoid tying public paths too closely to temporary folder names or implementation details.</p>
 </div>
 <div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Basic Setup</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Create Home, Lessons, LessonDetail, and NotFound routes.</p></div></div>
 </section>
@@ -6884,7 +7031,7 @@ ReactDOM.<span class="fn">createRoot</span>(document.<span class="fn">getElement
 <div class="concept-card"><h4>Mastery</h4><p>Use Tailwind as a constraint system, not as a license for inconsistent design.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="tailwind-css">
-<p>A visual interface needs Tailwind CSS to stay understandable and consistent. The point is not to memorize the term <strong>Tailwind CSS</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A visual interface needs Tailwind CSS to stay understandable and consistent.</p>
 <h4>Why this exists in real work</h4>
 <p>Tailwind CSS gives visual decisions a repeatable system.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>.card { padding: 1rem; }</pre></div>
@@ -7138,7 +7285,7 @@ npx tailwindcss init <span class="op">-p</span></pre>
 <div class="concept-card"><h4>Mastery</h4><p>Use sequencing only where it improves comprehension.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="stagger-children-animations">
-<p>A visual interface needs Stagger Children Animations to stay understandable and consistent. The point is not to memorize the term <strong>Stagger Children Animations</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>A visual interface needs Stagger Children Animations to stay understandable and consistent.</p>
 <h4>Why this exists in real work</h4>
 <p>Stagger Children Animations gives visual decisions a repeatable system.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>.card { padding: 1rem; }</pre></div>
@@ -7898,7 +8045,7 @@ ReactDOM.<span class="fn">createRoot</span>(document.<span class="fn">getElement
 <div class="concept-card"><h4>Mastery</h4><p>Write tests that describe user-visible behavior, not implementation details.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="testing-with-vitest-and-react-testing-library">
-<p>You want confidence that a future edit did not break behavior learners rely on. The point is not to memorize the term <strong>Testing with Vitest & React Testing Library</strong>; the point is to recognize the problem it removes. Once the problem is clear, the syntax has somewhere to attach in your mind.</p>
+<p>You want confidence that a future edit did not break behavior learners rely on.</p>
 <h4>Why this exists in real work</h4>
 <p>Tests capture expected behavior and replay it automatically.</p>
 <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>expect(formatMinutes(90)).toBe("1h 30m")</pre></div>
@@ -8017,25 +8164,32 @@ expect(await screen.findByText("No lessons yet")).toBeVisible()</pre></div>
 <div class="concept-card"><h4>Mastery</h4><p>Treat deployment as a reliable pipeline with rollback awareness and clear ownership.</p></div>
 </div>
 <div class="authored-topic-detail" data-authored-topic="deployment">
-<p>A learner meets Deployment as a practical tool, not just vocabulary. This turns the topic from an abstract definition into a decision you can make while building.</p>
-<h4>Why this exists in real work</h4>
-<p>Deployment exists because it solves a recurring development problem.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">why example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
+<h3>Deployment as the Final Proof</h3>
+<p>Deployment turns a local React project into something other people can open. It is not only uploading files; it proves that your build works outside your machine, assets resolve correctly, routes survive refresh, environment variables are configured, and the app can be recovered from version control.</p>
+<h4>Why deployment exists in real work</h4>
+<p>Software has value when users can reach it. A project that only runs on your laptop may hide missing build steps, broken asset paths, accidental local files, or environment assumptions. Deployment exposes those assumptions and forces the app to become repeatable.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">deployment loop</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>npm run build
+# Create the production files.
+
+npm run preview
+# Check the built version locally before publishing.
+
+git push origin main
+# Let the hosting workflow publish the committed app.</pre></div>
 <h4>What gets harder without it</h4>
-<p>Without it, the same problem is solved manually and inconsistently.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">without / weaker approach</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Protect one behavior with a check</h4>
-<p>Start with a simple test or build command that proves something still works. The goal is confidence before complexity.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// smallest working example</pre></div>
-<h4>Automate the checks humans forget</h4>
-<p>Intermediate release work puts linting, testing, and building into scripts or workflows so the same checks run every time.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// combine with a real component task</pre></div>
-<h4>Test failure paths and deployment assumptions</h4>
-<p>Advanced teams test empty data, API errors, permissions, build output, routing fallbacks, and environment configuration.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">advanced example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// add edge-case handling</pre></div>
-<h4>Make shipping repeatable</h4>
-<p>A mature deployment is not a ceremony. It is a pipeline that can be understood, rerun, diagnosed, and trusted.</p>
-<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">mastery example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// explain tradeoffs and choose deliberately</pre></div>
+<p>Without deployment practice, you may finish features that cannot be shared, tested by others, or trusted in a fresh environment. Bugs appear late: blank pages on refresh, missing icons, incorrect base paths, or API URLs that only work locally.</p>
+<h4>Beginner: build and preview</h4>
+<p>The first deployment skill is learning the difference between development and production. The dev server is forgiving and fast; the production build is what hosting platforms serve. Always preview the build before assuming the deployed app will work.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">beginner example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>npm run build
+npm run preview</pre></div>
+<h4>Intermediate: understand base paths and assets</h4>
+<p>GitHub Pages often serves a project under a repository path such as <code>/react-tutorial/</code>. If links, icons, service workers, or scripts assume the site is hosted at the domain root, the deployed page can break even when it worked locally.</p>
+<div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-lang">intermediate example</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre>// For Vite projects deployed under a repository path:
+export default defineConfig({
+  base: "/react-tutorial/",
+});</pre></div>
+<h4>Advanced and mastery: deploy through repeatable automation</h4>
+<p>A mature deployment does not depend on remembering manual steps. A workflow should build from committed files, publish the same output every time, and make failure visible. When deployment is automated, every push becomes a real integration check.</p>
 </div>
 <div class="exercise"><div class="exercise-header"><span class="exercise-title">Practice Ladder - Deployment</span><span class="exercise-num">Guided Practice</span></div><div class="exercise-body"><p>Deploy a static build to GitHub Pages, then change one line and confirm the workflow updates the site.</p></div></div>
 </section>
