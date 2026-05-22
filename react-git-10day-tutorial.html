@@ -9480,6 +9480,7 @@ try { dark  = localStorage.getItem('rg_dark') === 'true' } catch {}
 
 function init() {
   buildNav()
+  initMiniTocLinks()
   if (dark) document.body.classList.add('dark')
   syncSidebarState()
   renderNotes()
@@ -9488,6 +9489,75 @@ function init() {
   if (saved && document.getElementById(saved)) goToPage(saved)
   else goToPage('page-cover')
   window.addEventListener('scroll', updateProgress, { passive: true })
+}
+
+function normalizeTocText(text) {
+  return (text || '')
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/<[^>]*>/g, '')
+    .replace(/^\d+(\.\d+)?\s*/, '')
+    .replace(/\b(core|concepts|workflow|solutions|full|with|and|the|a|an)\b/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+}
+
+function miniTocTargetText(el) {
+  if (!el) return ''
+  if (el.classList && el.classList.contains('exercise')) {
+    var title = el.querySelector('.exercise-title')
+    return title ? title.textContent : el.textContent
+  }
+  return el.textContent
+}
+
+function scrollToMiniTocTarget(target) {
+  if (!target) return
+  var header = document.getElementById('top-header')
+  var offset = header ? header.offsetHeight + 18 : 80
+  var top = target.getBoundingClientRect().top + window.pageYOffset - offset
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+}
+
+function findMiniTocTarget(page, label, index) {
+  var normalizedLabel = normalizeTocText(label)
+  var headings = Array.from(page.querySelectorAll('h2'))
+  var exercises = Array.from(page.querySelectorAll('.exercise'))
+  var targets = headings.concat(exercises)
+
+  if (/exercise|solution/i.test(label) && exercises.length) return exercises[0]
+
+  var exact = targets.find(function(target) {
+    return normalizeTocText(miniTocTargetText(target)) === normalizedLabel
+  })
+  if (exact) return exact
+
+  var fuzzy = targets.find(function(target) {
+    var targetText = normalizeTocText(miniTocTargetText(target))
+    return targetText && normalizedLabel && (targetText.includes(normalizedLabel) || normalizedLabel.includes(targetText))
+  })
+  if (fuzzy) return fuzzy
+
+  return headings[index] || exercises[0] || null
+}
+
+function initMiniTocLinks() {
+  document.querySelectorAll('.page .mini-toc').forEach(function(toc) {
+    var page = toc.closest('.page')
+    if (!page) return
+    Array.from(toc.querySelectorAll('li')).forEach(function(item, index) {
+      item.setAttribute('role', 'link')
+      item.setAttribute('tabindex', '0')
+      item.addEventListener('click', function() {
+        scrollToMiniTocTarget(findMiniTocTarget(page, item.textContent, index))
+      })
+      item.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          scrollToMiniTocTarget(findMiniTocTarget(page, item.textContent, index))
+        }
+      })
+    })
+  })
 }
 
 function buildNav() {
